@@ -1,9 +1,4 @@
 #include <stdio.h>
-#include <unistd.h>
-#include <uk/essentials.h>
-
-/* Import user configuration: */
-#include <uk/config.h>
 
 int main(void)
 {

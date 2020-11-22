@@ -12,6 +12,7 @@ unikraft:
     # Enable profile-guided optimization (PGO) and coverage support.
     - CONFIG_OPTIMIZE_PGO=y
     - CONFIG_OPTIMIZE_PGO_GENERATE=y
+    #- CONFIG_OPTIMIZE_PGO_USE=y
     - CONFIG_LIBGCOV=y
     # Enable other options needed by dependencies.
     - CONFIG_LIBUKSCHEDCOOP=y
