@@ -1,0 +1,20 @@
+menuconfig APPHELLOWORLDGCOV_DEPENDENCIES
+        bool "Application to showcase gcov usage"
+        default y
+        select PLAT_KVM
+
+        select LIBPTHREAD_EMBEDDED
+        select LIBUNWIND
+        select LIBCOMPILER_RT
+        select LIBCXXABI
+        select LIBCXX
+        select LIBNEWLIBC
+        select LIBGCC
+        select LIBGCOV
+        select LIBPOSIX_SYSINFO
+        select LIBVFSCORE_AUTOMOUNT_ROOTFS
+        select OPTIMIZE_PGO
+
+choice LIBVFSCORE_ROOTFS
+        default LIBVFSCORE_ROOTFS_9PFS
+endchoice

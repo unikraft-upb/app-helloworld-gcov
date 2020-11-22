@@ -1,0 +1,7 @@
+/.config
+/.config.old
+/build/
+/fs0/
+*.swp
+*.swo
+*~
