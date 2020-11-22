@@ -1,0 +1,46 @@
+specification: '0.4'
+
+unikraft:
+  version: 'gcov'
+  kconfig:
+    # Enable 9pfs filesystem support.
+    - CONFIG_LIBUK9P=y
+    - CONFIG_LIB9PFS=y
+    - CONFIG_LIBVFSCORE_AUTOMOUNT_ROOTFS=y
+    - CONFIG_LIBVFSCORE_ROOTFS_9PFS=y
+    - CONFIG_LIBUKLIBPARAM=y
+    # Enable profile-guided optimization (PGO) and coverage support.
+    - CONFIG_OPTIMIZE_PGO=y
+    - CONFIG_OPTIMIZE_PGO_GENERATE=y
+    - CONFIG_LIBGCOV=y
+    # Enable other options needed by dependencies.
+    - CONFIG_LIBUKSCHEDCOOP=y
+    - CONFIG_LIBPOSIX_PROCESS=y
+    - CONFIG_LIBPOSIX_SYSINFO=y
+    - CONFIG_LIBPOSIX_USER=y
+    - CONFIG_LIBUKTIME=y
+
+architectures:
+  x86_64: true
+
+platforms:
+  kvm: true
+
+libraries:
+  pthread-embedded: 'staging'
+  libunwind: 'staging'
+  compiler-rt: 'staging'
+  libcxxabi: 'staging'
+  libcxx: 'staging'
+  newlib: 'staging'
+  gcc:
+    version: 'gcov'
+    source: 'https://github.com/cs-pub-ro/unikraft'
+
+run:
+  arguments: vfs.rootdev=fs0 vfs.rootfs=9pfs --
+
+  volumes:
+    fs0:
+      driver: 9pfs
+      source: ./fs0

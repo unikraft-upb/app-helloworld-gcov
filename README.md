@@ -5,6 +5,8 @@ The actual support is provided in gcc via the `-fprofile-arcs` option.
 Coverage support can be used for profile-guided optimization (PGO).
 This is why the usual way to compile and link a program under test is via the `-fprofile-generate` option; it includes the `-fprofile-arcs` option.
 
+Building and running the application can be done either using [kraft](https://github.com/unikraft/kraft) or with the manual approach.
+
 ## Dependencies
 
 The following libraries / dependencies are required:
@@ -16,17 +18,45 @@ The following libraries / dependencies are required:
 * `lib-newlib`
 * `lib-gcc`
 
-For `lib-gcc` use the [UPB clone](https://github.com/cs-pub-ro/lib-gcc), the `gcov` branch.
-Similarly, for Unikraft use [UPB clone](https://github.com/cs-pub-ro/unikraft), the `gcov` branch.
+For `lib-gcc` use the [UPB fork](https://github.com/cs-pub-ro/lib-gcc), the `gcov` branch.
+Similarly, for Unikraft use [UPB fork](https://github.com/cs-pub-ro/unikraft), the `gcov` branch.
 
 For the other libraries, use the `staging` branch.
+
+## Build using kraft
+
+The easiest way to build and run the Unikraft image is by using [kraft](https://github.com/unikraft/kraft).
+
+The custom UPB forks for Unikraft and `lib-gcc` are required. Create a custom folder structure for Unikraft and required dependencies:
+* Clone the [UPB fork](https://github.com/cs-pub-ro/unikraft). The clone name has to be `unikraft` (the default name).
+* Create a folder named `libs/`. The `unikraft` clone and the `libs/` folder are placed in the same folder.
+* Clone the library repositories in the `libs/` folder.
+  Be sure to name them according to `kraft`'s naming scheme: `pthread-embedded`, `libunwind`, `compiler-rt`, `libcxxabi`, `libcxx`, `newlib`, `gcc`.
+  Use the `gcov` branch for `lib-gcc` library.
+  Use the `staging` branch for the other libraries.
+
+For `kraft` use the `UK_WORKDIR` kraft environment variable to point to the folder storing the `unikraft` clone and the `libs/` folder.
+In the commands below, replace `/path/to/folder` with the actual path to this folder.
+
+First configure the application:
+```
+UK_WORKDIR=/path/to/folder kraft configure
+```
+
+Then build the application:
+```
+UK_WORKDIR=/path/to/folder kraft build
+```
+The resulting KVM image is `build/app-hello-world-gcov_kvm-x86_64`.
+
+## Build using the manual approach
+
+The manual approach gives more control on the configuration and build process.
 
 The dependencies have to be included in that order as done in the `Makefile`.
 Update the `Makefile` variables (`UK_ROOT`, `UK_LIBS`, `LIBS`) according to your setup.
 
-## Configuration
-
-Enter the configuration screen:
+Configure the application via the configuration screen:
 ```
 make menuconfig
 ```
@@ -69,8 +99,6 @@ If building the application for optimization, i.e. using the `-fprofile-use` opt
 APPHELLOWORLD_CFLAGS-$(CONFIG_OPTIMIZE_PGO_USE) += -fprofile-use
 ```
 
-## Build
-
 Build the application by running
 ```
 make
@@ -81,19 +109,26 @@ The resulting KVM image is `build/app-hello-world-gcov_kvm-x86_64`.
 ## Run
 
 The profiling information is generated as a `.gcda` file.
-Create a folder named `fs0` (the name is not important):
+Create a folder named `fs0` where the file is to be stored:
 ```
 mkdir fs0
 ```
 The `fs0` will be mapped as the root directory in the Unikernel via the 9pfs filesystem support.
 
-Use the [`qemu-guest` script in kraft](https://github.com/unikraft/kraft/blob/staging/scripts/qemu-guest) to run the Unikraft application in a KVM virtual machine:
+The Unikraft application is run in a KVM virtual machine.
+Run it with `kraft` using the command:
+```
+UK_WORKDIR=/path/to/folder kraft run -p kvm
+```
+Replace `/path/to/folder` with the actual path to the folder storing the `unikraft` clone and the `libs/` folder.
+
+Run it manually using the [`qemu-guest` script in kraft](https://github.com/unikraft/kraft/blob/staging/scripts/qemu-guest):
 ```
 qemu-guest -k build/app-hello-world-gcov_kvm-x86_64 -e fs0
 ```
-The script requires `root` privileges to run.
+Running the application, either using `kraft` or the `qemu-guest` script, requires `root` privileges.
 
 After running the profile generation image, the output file will be generated in `fs0/gcov_profiling/main.gcda`.
 The file will be use by the profile use phase after re-building the application for optimization.
-The file is created with `root` privileges by the `qemu-script`.
+The file is created with `root` privileges.
 Modifying or removing it will require `root` privileges.
