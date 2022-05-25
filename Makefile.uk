@@ -1,5 +1,4 @@
 $(eval $(call addlib,apphelloworld))
 
 APPHELLOWORLD_SRCS-y += $(APPHELLOWORLD_BASE)/main.c
-APPHELLOWORLD_CFLAGS-$(CONFIG_OPTIMIZE_PGO_GENERATE) += -fprofile-generate
-APPHELLOWORLD_CFLAGS-$(CONFIG_OPTIMIZE_PGO_USE) += -fprofile-use
+APPHELLOWORLD_CFLAGS-y += -fno-profile-arcs -fno-test-coverage
