@@ -3,6 +3,4 @@ menuconfig APPHELLOWORLDGCOV_DEPENDENCIES
         default y
         select PLAT_KVM
 
-        select LIBGCC
         select COVERAGE
-        select COVERAGE_TOOL_GCOV
